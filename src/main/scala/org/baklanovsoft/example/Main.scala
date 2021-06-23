@@ -27,18 +27,13 @@ import org.http4s.syntax.all._
 import sttp.tapir.server.http4s._
 import cats.effect.Resource
 import org.http4s.server.Server
-
-import scala.concurrent.duration
+import scala.concurrent.ExecutionContext.global
 
 object Main extends IOApp {
-
-  implicit private val ec: ExecutionContext = ExecutionContext.global
-  implicit private val cs: ContextShift[IO] = IO.contextShift(ec)
 
   private val testEndpoints = new TestEndpoints[IO]
 
   private val routes: HttpRoutes[IO] = Http4sServerInterpreter.toRoutes(testEndpoints.all)
-
   private val docs: HttpRoutes[IO]   = new SwaggerHttp4s(TestEndpoints.docs.toYaml).routes[IO]
 
   private val concat = routes <+> docs
@@ -49,7 +44,10 @@ object Main extends IOApp {
 
   private def resources: Resource[IO, Server] = for {
     blocker <- Blocker[IO]
-    server  <- BlazeServerBuilder[IO](ec).bindHttp(port = 8080, host = "localhost").withHttpApp(router).resource
+    server  <- BlazeServerBuilder[IO](global)
+                 .bindHttp(port = 8080, host = "localhost")
+                 .withHttpApp(router)
+                 .resource
   } yield server
 
 }
