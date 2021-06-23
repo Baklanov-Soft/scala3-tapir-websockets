@@ -17,11 +17,14 @@ object Dependencies {
     "com.softwaremill.sttp.tapir" %% "tapir-json-circe",
     "com.softwaremill.sttp.tapir" %% "tapir-http4s-server",
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs",
-    "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml"
-  ).map(_ % Versions.tapir) :+
-    ("com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % Versions.tapir).cross(
-      CrossVersion.for3Use2_13
-    )
+    "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml",
+    "com.softwaremill.sttp.tapir" %% "tapir-asyncapi-circe-yaml"
+  ).map(_ % Versions.tapir) ++
+    List(
+      "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s",
+      "com.softwaremill.sttp.tapir" %% "tapir-asyncapi-docs"
+    ).map(_ % Versions.tapir)
+      .map(_.cross(CrossVersion.for3Use2_13))
 
   lazy val circe = Seq(
     "io.circe" %% "circe-core",

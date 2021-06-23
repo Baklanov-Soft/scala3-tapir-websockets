@@ -28,15 +28,16 @@ import sttp.tapir.server.http4s._
 import cats.effect.Resource
 import org.http4s.server.Server
 import scala.concurrent.ExecutionContext.global
+import org.baklanovsoft.example.endpoints.WSEndpoints
 
 object Main extends IOApp {
 
-  private val testEndpoints = new TestEndpoints[IO]
+  private val routes: HttpRoutes[IO]   = Http4sServerInterpreter.toRoutes(new TestEndpoints[IO].all)
+  private val wsRoutes: HttpRoutes[IO] = Http4sServerInterpreter.toRoutes(new WSEndpoints[IO].all)
 
-  private val routes: HttpRoutes[IO] = Http4sServerInterpreter.toRoutes(testEndpoints.all)
-  private val docs: HttpRoutes[IO]   = new SwaggerHttp4s(TestEndpoints.docs.toYaml).routes[IO]
+  private val docs: HttpRoutes[IO] = new SwaggerHttp4s(TestEndpoints.docs.toYaml).routes[IO]
 
-  private val concat = routes <+> docs
+  private val concat = routes <+> wsRoutes <+> docs
   private val router = Router("/" -> concat).orNotFound
 
   override def run(args: List[String]): IO[ExitCode] =

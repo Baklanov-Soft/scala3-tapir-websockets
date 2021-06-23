@@ -10,6 +10,8 @@ import cats.effect.Sync
 import sttp.tapir.openapi.OpenAPI
 import sttp.tapir.docs.openapi._
 import sttp.tapir.server.ServerEndpoint
+import sttp.tapir.asyncapi.circe.yaml._
+import EndpointOps._
 
 class TestEndpoints[F[_]: Sync] {
   import TestEndpoints._
@@ -22,13 +24,19 @@ class TestEndpoints[F[_]: Sync] {
       }
     }
 
-  val all = List(countLogic)
+  private val getAsyncApiDocsLogic =
+    getAsyncApiDocsEndpoint.serverLogic{ _ => 
+      Sync[F].delay{
+        val docs = WSEndpoints.docs[F].toYaml
+        Right(docs)
+      }
+    }
+
+  val all = List(countLogic, getAsyncApiDocsLogic)
 
 }
 
 object TestEndpoints {
-
-  private val API_ROOT = "api" / "v1"
 
   val countEndpoint: Endpoint[String, Unit, Int, Any] =
     endpoint.post
@@ -37,10 +45,17 @@ object TestEndpoints {
       .in(stringBody)
       .out(plainBody[Int])
 
+  val getAsyncApiDocsEndpoint =
+    endpoint.get
+      .in(ASYNC_ROOT)
+      .in("docs")
+      .out(plainBody[String])
+
   val docs: OpenAPI =
     OpenAPIDocsInterpreter.toOpenAPI(
       List(
-        countEndpoint
+        countEndpoint,
+        getAsyncApiDocsEndpoint
       ),
       "Test",
       "1.0"
