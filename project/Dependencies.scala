@@ -8,7 +8,7 @@ object Dependencies {
     lazy val circe      = "0.14.1"
     lazy val fs2        = "2.5.6"
     lazy val http4s     = "0.22.0-RC1"
-    lazy val tapir      = "0.18.0-M17"
+    lazy val tapir      = "0.18.0-M18"
     lazy val logback    = "1.2.3"
   }
 

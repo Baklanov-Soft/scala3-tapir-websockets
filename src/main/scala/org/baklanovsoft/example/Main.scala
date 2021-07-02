@@ -29,11 +29,12 @@ import cats.effect.Resource
 import org.http4s.server.Server
 import scala.concurrent.ExecutionContext.global
 import org.baklanovsoft.example.endpoints.WSEndpoints
+import cats.effect.IO.ioConcurrentEffect
 
 object Main extends IOApp {
 
-  private val routes: HttpRoutes[IO]   = Http4sServerInterpreter.toRoutes(new TestEndpoints[IO].all)
-  private val wsRoutes: HttpRoutes[IO] = Http4sServerInterpreter.toRoutes(new WSEndpoints[IO].all)
+  private val routes: HttpRoutes[IO]   = Http4sServerInterpreter().toRoutes(new TestEndpoints[IO].all)
+  private val wsRoutes: HttpRoutes[IO] = Http4sServerInterpreter().toRoutes(new WSEndpoints[IO].all)
 
   private val docs: HttpRoutes[IO] = new SwaggerHttp4s(TestEndpoints.docs.toYaml).routes[IO]
 

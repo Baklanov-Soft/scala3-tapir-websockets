@@ -56,7 +56,7 @@ object WSEndpoints {
       .out(webSocketBody[String, CodecFormat.TextPlain, String, CodecFormat.TextPlain](Fs2Streams[F]))
       .summary("Test websocket endpoint for AsyncAPI docs")
 
-  def docs[F[_]] = AsyncAPIInterpreter.toAsyncAPI(
+  def docs[F[_]] = AsyncAPIInterpreter().toAsyncAPI(
     List(webSocketEndpoint[F]),
     title = "test websocket",
     version = "1.0"

@@ -52,7 +52,7 @@ object TestEndpoints {
       .out(plainBody[String])
 
   val docs: OpenAPI =
-    OpenAPIDocsInterpreter.toOpenAPI(
+    OpenAPIDocsInterpreter().toOpenAPI(
       List(
         countEndpoint,
         getAsyncApiDocsEndpoint
